@@ -2,6 +2,7 @@ package br.com.fieldops.api.infrastructure.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -26,12 +27,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-            .cors(Customizer.withDefaults()) // Libera CORS para integrações com o Frontend
+            .cors(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // Rotas públicas
-                .requestMatchers("/api/v1/auth/**").permitAll()
+                // Permite apenas o endpoint de Login publicamente
+                .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
                 // Swagger UI e OpenAPI
                 .requestMatchers(
                     "/v3/api-docs/**",
@@ -43,6 +44,7 @@ public class SecurityConfig {
                 // Rotas protegidas por Perfil
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMINISTRADOR")
                 .requestMatchers("/api/v1/supervisor/**").hasAnyRole("ADMINISTRADOR", "SUPERVISOR")
+                // Demais rotas (incluindo /api/v1/auth/me) exigem autenticação
                 .anyRequest().authenticated()
             )
             .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
