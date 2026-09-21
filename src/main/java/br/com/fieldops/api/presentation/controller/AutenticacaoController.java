@@ -1,7 +1,6 @@
 package br.com.fieldops.api.presentation.controller;
 
 import br.com.fieldops.api.domain.entity.Usuario;
-import br.com.fieldops.api.domain.repository.UsuarioRepository;
 import br.com.fieldops.api.infrastructure.security.TokenService;
 import br.com.fieldops.api.presentation.dto.LoginRequestDTO;
 import br.com.fieldops.api.presentation.dto.TokenResponseDTO;
@@ -40,9 +39,6 @@ public class AutenticacaoController {
     @Autowired
     private TokenService tokenService;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
     @PostMapping("/login")
     @Operation(
         summary = "Realizar login",
@@ -70,21 +66,15 @@ public class AutenticacaoController {
     })
     public ResponseEntity<TokenResponseDTO> login(@RequestBody @Valid LoginRequestDTO request) {
         try {
-            // 1. Cria objeto de autenticação com email e senha
             UsernamePasswordAuthenticationToken usernamePassword = 
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getSenha());
 
-            // 2. Autentica o usuário
             Authentication auth = authenticationManager.authenticate(usernamePassword);
 
-            // 3. Busca o usuário no banco
-            Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+            Usuario usuario = (Usuario) auth.getPrincipal();
 
-            // 4. Gera o token JWT
             String token = tokenService.gerarToken(usuario);
 
-            // 5. Cria resposta com token e dados do usuário
             TokenResponseDTO response = new TokenResponseDTO(
                 token,
                 usuario.getPerfil().name(),
@@ -114,11 +104,15 @@ public class AutenticacaoController {
             description = "Usuário autenticado e token válido"
         ),
         @ApiResponse(
-            responseCode = "403",
+            responseCode = "401",
             description = "Token ausente, inválido ou expirado"
         )
     })
     public ResponseEntity<TokenResponseDTO> me(@AuthenticationPrincipal Usuario usuario) {
+        if (usuario == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         TokenResponseDTO response = new TokenResponseDTO(
             null,
             usuario.getPerfil().name(),
