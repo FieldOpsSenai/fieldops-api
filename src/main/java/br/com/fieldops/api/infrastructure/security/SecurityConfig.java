@@ -31,8 +31,10 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // Permite apenas o endpoint de Login publicamente
+                // Endpoints de Autenticação Públicos (Login + Refresh)
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/auth/refresh").permitAll()
+                
                 // Swagger UI e OpenAPI
                 .requestMatchers(
                     "/v3/api-docs/**",
@@ -41,10 +43,12 @@ public class SecurityConfig {
                     "/swagger-resources/**",
                     "/webjars/**"
                 ).permitAll()
-                // Rotas protegidas por Perfil
-                .requestMatchers("/api/v1/admin/**").hasRole("ADMINISTRADOR")
-                .requestMatchers("/api/v1/supervisor/**").hasAnyRole("ADMINISTRADOR", "SUPERVISOR")
-                // Demais rotas (incluindo /api/v1/auth/me) exigem autenticação
+                
+                // Rotas protegidas por Perfil/Autoridade
+                .requestMatchers("/api/v1/admin/**").hasAuthority("ADMINISTRADOR")
+                .requestMatchers("/api/v1/supervisor/**").hasAnyAuthority("ADMINISTRADOR", "SUPERVISOR")
+                
+                // Demais rotas exigem autenticação
                 .anyRequest().authenticated()
             )
             .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
