@@ -6,9 +6,9 @@ spring:
     name: fieldops-api
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/fieldops_db
-    username: postgres
-    password: 200523
+    url: jdbc:postgresql://localhost:5432/fieldops
+    username: admim
+    password: admim123
     driver-class-name: org.postgresql.Driver
 
   jpa:
