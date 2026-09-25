@@ -1,17 +1,72 @@
-# CI e checks obrigatorios
+# CI da API
 
-O projeto possui um workflow de GitHub Actions em `.github/workflows/ci.yml`.
-Ele e executado em Pull Requests e em pushes para a branch `main`.
+O workflow de GitHub Actions esta em `.github/workflows/ci.yml` e automatiza a
+validacao, os testes e o build da API.
 
-## Checks executados
+## Quando o workflow executa
 
-O workflow possui tres jobs independentes ou dependentes conforme a etapa:
+O workflow possui dois gatilhos:
 
-1. `Maven validation`: executa `./mvnw -B -ntp validate`.
-2. `Tests`: inicia PostgreSQL 15 e executa `./mvnw -B -ntp test`.
-3. `Build`: executa `./mvnw -B -ntp package -DskipTests` somente depois que a validacao e os testes passam.
+- `pull_request` para a branch `main`: executa os checks em cada Pull Request
+   direcionado para `main`;
+- `push` para a branch `main`: executa os checks depois que uma alteracao chega
+   em `main`.
 
-O job de testes usa os mesmos valores esperados atualmente pela API:
+## Configuracoes gerais
+
+### Permissoes
+
+```yaml
+permissions:
+   contents: read
+```
+
+Concede ao workflow somente permissao de leitura do codigo do repositorio. Isso
+reduz o acesso do job ao minimo necessario para fazer checkout e executar o
+build.
+
+### Concorrencia
+
+```yaml
+concurrency:
+   group: api-ci-${{ github.workflow }}-${{ github.ref }}
+   cancel-in-progress: true
+```
+
+Agrupa execucoes do mesmo workflow por referencia. Se um novo commit for
+enviado antes da conclusao de uma execucao anterior, a execucao antiga e
+cancelada para evitar trabalho desnecessario.
+
+## Jobs executados
+
+### `Maven validation`
+
+Esse job verifica se o projeto Maven esta corretamente configurado, sem
+compilar ou executar os testes:
+
+```bash
+./mvnw -B -ntp validate
+```
+
+- `./mvnw`: usa a versao do Maven definida pelo projeto;
+- `-B`: executa o Maven em modo nao interativo;
+- `-ntp`: desativa a exibicao do progresso de download;
+- `validate`: verifica a estrutura e a configuracao do projeto.
+
+### `Tests`
+
+Esse job executa os testes automatizados da API. Antes dos testes, o GitHub
+Actions inicia um servico PostgreSQL 15 para que os testes de integracao possam
+carregar o contexto do Spring e acessar o banco.
+
+```bash
+./mvnw -B -ntp test
+```
+
+O servico PostgreSQL possui uma verificacao de saude com `pg_isready`. O job so
+prossegue quando o banco estiver pronto para receber conexoes.
+
+O job usa os mesmos valores esperados atualmente pela API:
 
 ```text
 Banco: fieldops_db
@@ -20,24 +75,30 @@ Senha: 200523
 Porta: 5432
 ```
 
-## Configurar bloqueio de merge
+### `Build`
 
-Essa configuracao precisa ser feita nas regras do repositorio no GitHub:
+Esse job gera o artefato distribuivel da API:
 
-1. Abra `Settings` > `Branches`.
-2. Crie ou edite a regra da branch `main`.
-3. Ative `Require a pull request before merging`.
-4. Ative `Require status checks to pass before merging`.
-5. Selecione estes checks como obrigatorios:
-   - `Maven validation`;
-   - `Tests`;
-   - `Build`.
-6. Ative `Require branches to be up to date before merging`, quando a equipe quiser exigir que o PR esteja atualizado com `main`.
-7. Ative `Do not allow bypassing the above settings`, se administradores tambem precisarem respeitar os checks.
-8. Salve a regra.
+```bash
+./mvnw -B -ntp package -DskipTests
+```
 
-Depois disso, um Pull Request nao podera ser mesclado enquanto qualquer check obrigatorio estiver falhando ou pendente.
+- `package`: compila o codigo e gera o arquivo JAR;
+- `-DskipTests`: nao executa os testes novamente, pois eles ja foram executados
+   no job `Tests`;
+- `needs`: faz o build depender dos jobs `Maven validation` e `Tests`.
 
-## Observacao
+Assim, o build so e considerado concluido depois que a validacao e os testes
+terminarem com sucesso.
 
-O bloqueio de merge nao e definido pelo arquivo YAML. O workflow publica os checks; a regra de protecao da `main` no GitHub e que determina se eles sao obrigatorios.
+## Fluxo resumido
+
+```text
+Pull Request ou push para main
+                     |
+                     +--> Maven validation
+                     |
+                     +--> Tests + PostgreSQL
+                                     |
+                                     +--> Build
+```
