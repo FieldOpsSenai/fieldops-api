@@ -18,8 +18,8 @@ public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
 
-    // Token válido por 8 horas (28.800.000 ms)
-    private static final long EXPIRATION_TIME = 28800000L;
+    // Token JWT de acesso válido por 15 minutos (900.000 ms)
+    private static final long EXPIRATION_TIME = 900000L;
 
     private Key getSigningKey() {
         byte[] keyBytes = this.secret.getBytes(StandardCharsets.UTF_8);

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data  // ⭐ Gera todos os Getters, Setters, toString, equals, hashCode
 @NoArgsConstructor  // ⭐ Gera construtor vazio
 @AllArgsConstructor  // ⭐ Gera construtor com todos os argumentos
-@Schema(description = "DTO com token JWT e dados do usuário")
+@Schema(description = "DTO com token JWT, refresh token e dados do usuário")
 public class TokenResponseDTO {
     
     @Schema(
@@ -16,6 +16,12 @@ public class TokenResponseDTO {
         example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
     )
     private String token;
+
+    @Schema(
+        description = "Refresh token para renovação da sessão",
+        example = "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
+    )
+    private String refreshToken;
     
     @Schema(
         description = "Tipo de token",
@@ -43,17 +49,19 @@ public class TokenResponseDTO {
     private String email;
     
     @Schema(
-        description = "Tempo de expiração do token em segundos",
-        example = "86400"
+        description = "Tempo de expiração do token de acesso em segundos",
+        example = "900"
     )
     private Long expiracao;
     
-    // ⭐ Construtor personalizado que você já tinha
-    public TokenResponseDTO(String token, String perfil, String nome, String email) {
+    // ⭐ Construtor personalizado atualizado com o refreshToken
+    public TokenResponseDTO(String token, String refreshToken, String perfil, String nome, String email, Long expiracao) {
         this.token = token;
+        this.refreshToken = refreshToken;
+        this.tipo = "Bearer";
         this.perfil = perfil;
         this.nome = nome;
         this.email = email;
-        this.expiracao = 86400L;
+        this.expiracao = expiracao;
     }
 }
