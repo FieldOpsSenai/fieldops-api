@@ -7,13 +7,16 @@ import lombok.Data;
 @Data
 public class EquipamentoRequestDTO {
 
-    @NotBlank(message = "O nome do equipamento é obrigatório")
-    private String nome;
+    private String codigoQr;
 
     @NotBlank(message = "O número de série é obrigatório")
     private String numeroSerie;
 
-    private String tipo;
+    @NotBlank(message = "A categoria é obrigatória")
+    private String categoria;
+
+    @NotBlank(message = "O status é obrigatório")
+    private String status;
 
     @NotNull(message = "O ID do local é obrigatório")
     private Long localId;

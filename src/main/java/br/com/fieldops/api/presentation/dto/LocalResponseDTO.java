@@ -10,15 +10,15 @@ public class LocalResponseDTO {
     private String nome;
     private String endereco;
     private Long clienteId;
-    private String clienteNome;
-    private Boolean ativo;
+    private String clienteRazaoSocial;
 
     public LocalResponseDTO(Local local) {
         this.id = local.getId();
         this.nome = local.getNome();
         this.endereco = local.getEndereco();
-        this.clienteId = local.getCliente().getId();
-        this.clienteNome = local.getCliente() != null ? local.getCliente().getNome() : null;
-        this.ativo = local.getAtivo();
+        if (local.getCliente() != null) {
+            this.clienteId = local.getCliente().getId();
+            this.clienteRazaoSocial = local.getCliente().getRazaoSocial();
+        }
     }
 }

@@ -7,8 +7,8 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5432/fieldops
-    username: admim
-    password: admim123
+    username: admin
+    password: admin123
     driver-class-name: org.postgresql.Driver
 
   jpa:

@@ -34,7 +34,7 @@ public class TokenService {
                 .setIssuer("FieldOps API")
                 .setSubject(usuario.getEmail())
                 .claim("id", usuario.getId())
-                .claim("perfil", usuario.getPerfil().name())
+                .claim("perfil", usuario.getPerfil().getNome()) 
                 .setIssuedAt(hoje)
                 .setExpiration(dataExpiracao)
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)

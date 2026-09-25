@@ -11,19 +11,14 @@ import lombok.NoArgsConstructor;
 public class ClienteResponseDTO {
 
     private Long id;
-    private String nome;
+    private String razaoSocial;
     private String cnpj;
-    private String telefone;
-    private String email;
-    private Boolean ativo;
+    private String contato;
 
-    // Construtor auxiliar para converter a Entidade direto para o DTO
     public ClienteResponseDTO(Cliente cliente) {
         this.id = cliente.getId();
-        this.nome = cliente.getNome();
+        this.razaoSocial = cliente.getRazaoSocial();
         this.cnpj = cliente.getCnpj();
-        this.telefone = cliente.getTelefone();
-        this.email = cliente.getEmail();
-        this.ativo = cliente.getAtivo();
+        this.contato = cliente.getContato();
     }
 }

@@ -10,6 +10,7 @@ public class LocalRequestDTO {
     @NotBlank(message = "O nome do local é obrigatório")
     private String nome;
 
+    @NotBlank(message = "O endereço é obrigatório")
     private String endereco;
 
     @NotNull(message = "O ID do cliente é obrigatório")

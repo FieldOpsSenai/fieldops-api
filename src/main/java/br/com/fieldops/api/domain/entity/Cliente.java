@@ -1,43 +1,27 @@
 package br.com.fieldops.api.domain.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
-@Entity
 @Table(name = "clientes")
-@Data
+@Entity(name = "Cliente")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 150)
-    private String nome;
+    @Column(name = "razao_social", nullable = false, length = 150)
+    private String razaoSocial;
 
-    @Column(nullable = false, unique = true, length = 20)
+    @Column(unique = true, length = 20)
     private String cnpj;
 
-    @Column(nullable = false, length = 20)
-    private String telefone;
-
-    @Column(nullable = false, unique = true, length = 100)
-    private String email;
-
-    @Column(nullable = false)
-    private Boolean ativo = true;
-
-    // Método auxiliar para responder ao DTO sem exigir a coluna razao_social no banco
-    public String getRazaoSocial() {
-        return this.nome;
-    }
+    @Column(nullable = false, length = 100)
+    private String contato;
 }

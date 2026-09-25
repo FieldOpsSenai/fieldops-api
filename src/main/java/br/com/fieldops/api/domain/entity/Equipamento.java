@@ -1,41 +1,34 @@
 package br.com.fieldops.api.domain.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
-@Entity
-@Table(name = "equipamentos")
-@Data
+@Table(name = "equipamento")
+@Entity(name = "Equipamento")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class Equipamento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 150)
-    private String nome;
-
-    @Column(name = "numero_serie", nullable = false, unique = true, length = 100)
-    private String numeroSerie;
-
-    @Column(length = 100)
-    private String tipo;
-
-    @Column(nullable = false)
-    private Boolean ativo = true;
-
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "local_id", nullable = false)
     private Local local;
+
+    @Column(name = "codigo_qr", unique = true, length = 100)
+    private String codigoQr;
+
+    @Column(name = "numero_serie", nullable = false, length = 100)
+    private String numeroSerie;
+
+    @Column(nullable = false, length = 50)
+    private String categoria;
+
+    @Column(nullable = false, length = 30)
+    private String status;
 }

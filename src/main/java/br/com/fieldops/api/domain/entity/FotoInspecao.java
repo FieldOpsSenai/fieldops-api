@@ -1,88 +1,45 @@
 package br.com.fieldops.api.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
-@Table(name = "tb_fotos_inspecao")
+@Table(name = "evidencias")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class FotoInspecao {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
-    private String nomeArquivo;
-
-    @Column(nullable = false)
-    private String caminhoArquivo;
-
-    @Column(nullable = false)
-    private String tipoConteudo;
-
-    @Column(nullable = false)
-    private LocalDateTime dataUpload;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inspecao_id", nullable = false)
+    @JoinColumn(name = "atribuicao_id", nullable = false)
     private Inspecao inspecao;
 
-    public FotoInspecao() {
-    }
+    @Column(name = "caminho_arquivo", nullable = false)
+    private String caminhoArquivo;
 
-    public FotoInspecao(String nomeArquivo, String caminhoArquivo, String tipoConteudo, LocalDateTime dataUpload, Inspecao inspecao) {
-        this.nomeArquivo = nomeArquivo;
-        this.caminhoArquivo = caminhoArquivo;
-        this.tipoConteudo = tipoConteudo;
-        this.dataUpload = dataUpload;
-        this.inspecao = inspecao;
-    }
+    @Column(name = "latitude", precision = 10, scale = 8)
+    private BigDecimal latitude;
 
-    public Long getId() {
-        return id;
-    }
+    @Column(name = "longitude", precision = 11, scale = 8)
+    private BigDecimal longitude;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @Column(name = "criado_em")
+    private LocalDateTime criadoEm;
 
-    public String getNomeArquivo() {
-        return nomeArquivo;
-    }
-
-    public void setNomeArquivo(String nomeArquivo) {
-        this.nomeArquivo = nomeArquivo;
-    }
-
-    public String getCaminhoArquivo() {
-        return caminhoArquivo;
-    }
-
-    public void setCaminhoArquivo(String caminhoArquivo) {
-        this.caminhoArquivo = caminhoArquivo;
-    }
-
-    public String getTipoConteudo() {
-        return tipoConteudo;
-    }
-
-    public void setTipoConteudo(String tipoConteudo) {
-        this.tipoConteudo = tipoConteudo;
-    }
-
-    public LocalDateTime getDataUpload() {
-        return dataUpload;
-    }
-
-    public void setDataUpload(LocalDateTime dataUpload) {
-        this.dataUpload = dataUpload;
-    }
-
-    public Inspecao getInspecao() {
-        return inspecao;
-    }
-
-    public void setInspecao(Inspecao inspecao) {
-        this.inspecao = inspecao;
+    @PrePersist
+    public void prePersist() {
+        if (this.criadoEm == null) {
+            this.criadoEm = LocalDateTime.now();
+        }
     }
 }

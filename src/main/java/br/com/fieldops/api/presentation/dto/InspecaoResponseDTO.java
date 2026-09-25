@@ -1,122 +1,53 @@
 package br.com.fieldops.api.presentation.dto;
 
 import br.com.fieldops.api.domain.entity.Inspecao;
-import br.com.fieldops.api.domain.entity.StatusInspecao;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
+@Data
+@NoArgsConstructor
 public class InspecaoResponseDTO {
 
-    private Long id;
-    private String descricao;
-    private StatusInspecao status;
-    private LocalDateTime dataAgendada;
-    private LocalDateTime dataRealizacao;
-    private String observacoes;
+    private UUID id;
     private Long equipamentoId;
-    private String equipamentoNome;
-    private Long usuarioId;
-    private String usuarioNome;
-
-    public InspecaoResponseDTO() {
-    }
+    private String equipamentoNumeroSerie;
+    private Long tecnicoId;
+    private String tecnicoNome;
+    private Long supervisorId;
+    private String status;
+    private LocalDateTime dataAgendamento;
+    private LocalDateTime dataInicio;
+    private LocalDateTime dataConclusao;
+    private BigDecimal latitudeExecucao;
+    private BigDecimal longitudeExecucao;
+    private String observacoesRevisao;
 
     public InspecaoResponseDTO(Inspecao inspecao) {
         this.id = inspecao.getId();
-        this.descricao = inspecao.getDescricao();
         this.status = inspecao.getStatus();
-        this.dataAgendada = inspecao.getDataAgendada();
-        this.dataRealizacao = inspecao.getDataRealizacao();
-        this.observacoes = inspecao.getObservacoes();
-        
+        this.dataAgendamento = inspecao.getDataAgendamento();
+        this.dataInicio = inspecao.getDataInicio();
+        this.dataConclusao = inspecao.getDataConclusao();
+        this.latitudeExecucao = inspecao.getLatitudeExecucao();
+        this.longitudeExecucao = inspecao.getLongitudeExecucao();
+        this.observacoesRevisao = inspecao.getObservacoesRevisao();
+
         if (inspecao.getEquipamento() != null) {
             this.equipamentoId = inspecao.getEquipamento().getId();
-            this.equipamentoNome = inspecao.getEquipamento().getNome();
+            this.equipamentoNumeroSerie = inspecao.getEquipamento().getNumeroSerie();
         }
-        
-        if (inspecao.getUsuario() != null) {
-            this.usuarioId = inspecao.getUsuario().getId();
-            this.usuarioNome = inspecao.getUsuario().getNome();
+
+        if (inspecao.getTecnico() != null) {
+            this.tecnicoId = inspecao.getTecnico().getId();
+            this.tecnicoNome = inspecao.getTecnico().getNome();
         }
-    }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
-
-    public StatusInspecao getStatus() {
-        return status;
-    }
-
-    public void setStatus(StatusInspecao status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getDataAgendada() {
-        return dataAgendada;
-    }
-
-    public void setDataAgendada(LocalDateTime dataAgendada) {
-        this.dataAgendada = dataAgendada;
-    }
-
-    public LocalDateTime getDataRealizacao() {
-        return dataRealizacao;
-    }
-
-    public void setDataRealizacao(LocalDateTime dataRealizacao) {
-        this.dataRealizacao = dataRealizacao;
-    }
-
-    public String getObservacoes() {
-        return observacoes;
-    }
-
-    public void setObservacoes(String observacoes) {
-        this.observacoes = observacoes;
-    }
-
-    public Long getEquipamentoId() {
-        return equipamentoId;
-    }
-
-    public void setEquipamentoId(Long equipamentoId) {
-        this.equipamentoId = equipamentoId;
-    }
-
-    public String getEquipamentoNome() {
-        return equipamentoNome;
-    }
-
-    public void setEquipamentoNome(String equipamentoNome) {
-        this.equipamentoNome = equipamentoNome;
-    }
-
-    public Long getUsuarioId() {
-        return usuarioId;
-    }
-
-    public void setUsuarioId(Long usuarioId) {
-        this.usuarioId = usuarioId;
-    }
-
-    public String getUsuarioNome() {
-        return usuarioNome;
-    }
-
-    public void setUsuarioNome(String usuarioNome) {
-        this.usuarioNome = usuarioNome;
+        if (inspecao.getSupervisor() != null) {
+            this.supervisorId = inspecao.getSupervisor().getId();
+        }
     }
 }

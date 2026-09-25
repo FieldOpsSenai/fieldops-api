@@ -141,3 +141,10 @@ CREATE TABLE historico_auditoria (
     dados_novos JSONB,
     criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- CARGA INICIAL DE DADOS (SEEDS)
+INSERT INTO perfil (id, nome, descricao, tipo_perfil) VALUES 
+(1, 'Administrador', 'Acesso total ao sistema', 1),
+(2, 'Supervisor', 'Gestão de equipes e vistorias', 2),
+(3, 'Técnico', 'Execução de inspeções em campo', 3)
+ON CONFLICT (id) DO NOTHING;

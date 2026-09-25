@@ -7,20 +7,22 @@ import lombok.Data;
 public class EquipamentoResponseDTO {
 
     private Long id;
-    private String nome;
+    private String codigoQr;
     private String numeroSerie;
-    private String tipo;
-    private Boolean ativo;
+    private String categoria;
+    private String status;
     private Long localId;
     private String localNome;
 
     public EquipamentoResponseDTO(Equipamento equipamento) {
         this.id = equipamento.getId();
-        this.nome = equipamento.getNome();
+        this.codigoQr = equipamento.getCodigoQr();
         this.numeroSerie = equipamento.getNumeroSerie();
-        this.tipo = equipamento.getTipo();
-        this.ativo = equipamento.getAtivo();
-        this.localId = equipamento.getLocal().getId();
-        this.localNome = equipamento.getLocal().getNome();
+        this.categoria = equipamento.getCategoria();
+        this.status = equipamento.getStatus();
+        if (equipamento.getLocal() != null) {
+            this.localId = equipamento.getLocal().getId();
+            this.localNome = equipamento.getLocal().getNome();
+        }
     }
 }

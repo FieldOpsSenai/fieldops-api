@@ -30,22 +30,15 @@ public class ClienteController {
     @PostMapping
     @Operation(summary = "Cadastrar novo cliente")
     public ResponseEntity<?> cadastrar(@RequestBody @Valid ClienteRequestDTO dto) {
-        if (clienteRepository.existsByCnpj(dto.getCnpj())) {
+        if (dto.getCnpj() != null && clienteRepository.existsByCnpj(dto.getCnpj())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Já existe um cliente cadastrado com este CNPJ");
         }
 
-        if (clienteRepository.existsByEmail(dto.getEmail())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Já existe um cliente cadastrado com este e-mail");
-        }
-
         Cliente cliente = new Cliente();
-        cliente.setNome(dto.getNome());
+        cliente.setRazaoSocial(dto.getRazaoSocial());
         cliente.setCnpj(dto.getCnpj());
-        cliente.setTelefone(dto.getTelefone());
-        cliente.setEmail(dto.getEmail());
-        cliente.setAtivo(true);
+        cliente.setContato(dto.getContato());
 
         Cliente clienteSalvo = clienteRepository.save(cliente);
         return ResponseEntity.status(HttpStatus.CREATED).body(new ClienteResponseDTO(clienteSalvo));
@@ -72,13 +65,12 @@ public class ClienteController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Inativar cliente (RN-013)")
-    public ResponseEntity<Void> inativar(@PathVariable Long id) {
+    @Operation(summary = "Excluir cliente")
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
 
-        cliente.setAtivo(false);
-        clienteRepository.save(cliente);
+        clienteRepository.delete(cliente);
 
         return ResponseEntity.noContent().build();
     }

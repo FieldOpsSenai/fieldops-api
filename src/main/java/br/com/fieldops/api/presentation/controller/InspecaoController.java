@@ -3,15 +3,15 @@ package br.com.fieldops.api.presentation.controller;
 import br.com.fieldops.api.domain.service.InspecaoService;
 import br.com.fieldops.api.presentation.dto.InspecaoRequestDTO;
 import br.com.fieldops.api.presentation.dto.InspecaoResponseDTO;
+import br.com.fieldops.api.presentation.dto.InspecaoStatusDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import br.com.fieldops.api.presentation.dto.InspecaoStatusDTO;
-
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/inspecoes")
@@ -38,7 +38,7 @@ public class InspecaoController {
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<InspecaoResponseDTO> atualizarStatus(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @RequestBody @Valid InspecaoStatusDTO dto) {
         
         InspecaoResponseDTO response = inspecaoService.atualizarStatus(id, dto);

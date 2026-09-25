@@ -18,30 +18,46 @@ class TokenServiceTest {
     @BeforeEach
     void setUp() {
         tokenService = new TokenService();
-        ReflectionTestUtils.setField(tokenService, "secret", "minha-chave-secreta-muito-segura-para-testes-fieldops-123");
+        // Injeta a secret de teste na propriedade anotada com @Value
+        ReflectionTestUtils.setField(tokenService, "secret", "12345678901234567890123456789012");
+
+        // Instancia a Entidade Perfil em vez de chamar o Enum Perfil.ADMINISTRADOR
+        Perfil perfilAdmin = new Perfil();
+        perfilAdmin.setId(1L);
+        perfilAdmin.setNome("ADMINISTRADOR");
 
         usuario = new Usuario();
         usuario.setId(1L);
-        usuario.setNome("Desenvolvedor Teste");
-        usuario.setEmail("dev@fieldops.com");
-        usuario.setPerfil(Perfil.ADMINISTRADOR);
+        usuario.setNome("Usuário Teste");
+        usuario.setEmail("teste@fieldops.com");
+        usuario.setSenha("123456");
+        usuario.setPerfil(perfilAdmin);
+        usuario.setAtivo(true);
     }
 
     @Test
-    @DisplayName("Deve gerar token JWT valido com sucesso")
-    void deveGerarTokenComSucesso() {
+    @DisplayName("Deve gerar um token JWT válido para o usuário")
+    void gerarTokenSucesso() {
         String token = tokenService.gerarToken(usuario);
 
         assertNotNull(token);
-        assertFalse(token.trim().isEmpty());
+        assertFalse(token.isEmpty());
     }
 
     @Test
-    @DisplayName("Deve extrair o subject (email) do token gerado")
-    void deveValidarEObterSubjectDoToken() {
+    @DisplayName("Deve extrair o e-mail do subject do token JWT")
+    void getSubjectSucesso() {
         String token = tokenService.gerarToken(usuario);
         String subject = tokenService.getSubject(token);
 
-        assertEquals("dev@fieldops.com", subject);
+        assertEquals(usuario.getEmail(), subject);
+    }
+
+    @Test
+    @DisplayName("Deve retornar null ao validar token inválido")
+    void getSubjectTokenInvalido() {
+        String subject = tokenService.getSubject("token_invalido_qualquer");
+
+        assertNull(subject);
     }
 }

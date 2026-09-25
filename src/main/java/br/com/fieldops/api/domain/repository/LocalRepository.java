@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface LocalRepository extends JpaRepository<Local, Long> {
-    List<Local> findByClienteIdAndAtivoTrue(Long clienteId);
-    List<Local> findByAtivoTrue();
+
+    List<Local> findByClienteId(Long clienteId);
 }

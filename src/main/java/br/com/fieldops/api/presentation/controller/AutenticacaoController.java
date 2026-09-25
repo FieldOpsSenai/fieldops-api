@@ -77,7 +77,7 @@ public class AutenticacaoController {
 
             TokenResponseDTO response = new TokenResponseDTO(
                 token,
-                usuario.getPerfil().name(),
+                usuario.getPerfil().getNome(),
                 usuario.getNome(),
                 usuario.getEmail()
             );
@@ -115,7 +115,7 @@ public class AutenticacaoController {
 
         TokenResponseDTO response = new TokenResponseDTO(
             null,
-            usuario.getPerfil().name(),
+            usuario.getPerfil().getNome(),
             usuario.getNome(),
             usuario.getEmail()
         );
