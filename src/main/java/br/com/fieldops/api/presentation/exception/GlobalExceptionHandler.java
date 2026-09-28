@@ -3,6 +3,7 @@ package br.com.fieldops.api.presentation.exception;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
@@ -22,6 +23,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Void> tratarErro404() {
         return ResponseEntity.notFound().build();
+    }
+
+    // Trata erro de permissão do Spring Security (@PreAuthorize) -> HTTP 403
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> tratarAccessDeniedException() {
+        Map<String, Object> resposta = new HashMap<>();
+        resposta.put("timestamp", LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
+        resposta.put("status", HttpStatus.FORBIDDEN.value());
+        resposta.put("erro", "Acesso Negado");
+        resposta.put("mensagem", "Seu perfil nao tem permissao para acessar este recurso.");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(resposta);
     }
 
     // Trata falha de credenciais inválidas (e-mail/senha incorretos) -> HTTP 401
