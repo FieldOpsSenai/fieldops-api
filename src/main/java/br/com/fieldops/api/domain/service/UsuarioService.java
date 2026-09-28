@@ -5,6 +5,7 @@ import br.com.fieldops.api.domain.entity.Usuario;
 import br.com.fieldops.api.domain.repository.UsuarioRepository;
 import br.com.fieldops.api.presentation.dto.UsuarioRequestDTO;
 import br.com.fieldops.api.presentation.dto.UsuarioResponseDTO;
+import br.com.fieldops.api.presentation.dto.UsuarioUpdateDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,14 +39,49 @@ public class UsuarioService {
     }
 
     public List<UsuarioResponseDTO> listarTodos() {
-        return usuarioRepository.findByAtivoTrue().stream()
+        return usuarioRepository.findAll().stream()
                 .map(UsuarioResponseDTO::new)
                 .toList();
+    }
+
+    public UsuarioResponseDTO buscarPorId(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado com o ID: " + id));
+        return new UsuarioResponseDTO(usuario);
     }
 
     public List<UsuarioResponseDTO> listarPorPerfil(Perfil perfil) {
         return usuarioRepository.findByPerfilAndAtivoTrue(perfil).stream()
                 .map(UsuarioResponseDTO::new)
                 .toList();
+    }
+
+    @Transactional
+    public UsuarioResponseDTO atualizar(Long id, UsuarioUpdateDTO dto) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado com o ID: " + id));
+
+        if (!usuario.getEmail().equals(dto.getEmail()) && usuarioRepository.existsByEmail(dto.getEmail())) {
+            throw new IllegalArgumentException("O e-mail " + dto.getEmail() + " já está em uso por outro usuário.");
+        }
+
+        usuario.setNome(dto.getNome());
+        usuario.setEmail(dto.getEmail());
+        usuario.setPerfil(dto.getPerfil());
+
+        if (dto.getSenha() != null && !dto.getSenha().isBlank()) {
+            usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
+        }
+
+        return new UsuarioResponseDTO(usuarioRepository.save(usuario));
+    }
+
+    @Transactional
+    public void inativar(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado com o ID: " + id));
+
+        usuario.setAtivo(false);
+        usuarioRepository.save(usuario);
     }
 }

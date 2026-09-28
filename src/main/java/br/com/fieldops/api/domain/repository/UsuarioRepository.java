@@ -14,7 +14,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     Optional<Usuario> findByEmail(String email);
 
-    // Método necessário para o UserDetailsService do Spring Security
     UserDetails findUserDetailsByEmail(String email);
 
     boolean existsByEmail(String email);
