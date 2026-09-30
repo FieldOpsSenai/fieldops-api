@@ -1,23 +1,27 @@
 package br.com.fieldops.api.presentation.dto;
 
 import br.com.fieldops.api.domain.entity.Perfil;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public class UsuarioUpdateDTO {
 
+    @Schema(description = "Nome completo do usuário", example = "Carlos Eduardo")
     @NotBlank(message = "O nome é obrigatório")
     private String nome;
 
+    @Schema(description = "E-mail de acesso do usuário", example = "carlos.eduardo@fieldops.com.br")
     @NotBlank(message = "O e-mail é obrigatório")
     @Email(message = "Formato de e-mail inválido")
     private String email;
 
+    @Schema(description = "Perfil de acesso do usuário no sistema", example = "ADMINISTRADOR")
     @NotNull(message = "O perfil é obrigatório")
     private Perfil perfil;
 
-    // Senha opcional na edição (só altera se enviada)
+    @Schema(description = "Nova senha de acesso (opcional na edição)", example = "NovaSenha@2026")
     private String senha;
 
     public UsuarioUpdateDTO() {

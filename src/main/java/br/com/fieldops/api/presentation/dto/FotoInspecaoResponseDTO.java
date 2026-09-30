@@ -1,15 +1,25 @@
 package br.com.fieldops.api.presentation.dto;
 
 import br.com.fieldops.api.domain.entity.FotoInspecao;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 
 public class FotoInspecaoResponseDTO {
 
+    @Schema(description = "Identificador único da foto", example = "50")
     private Long id;
+
+    @Schema(description = "Nome original do arquivo armazenado", example = "foto_compressor_01.jpg")
     private String nomeArquivo;
+
+    @Schema(description = "Tipo do conteúdo (MIME type)", example = "image/jpeg")
     private String tipoConteudo;
+
+    @Schema(description = "Data e hora em que a foto foi vinculada", example = "2026-10-05T10:15:00")
     private LocalDateTime dataUpload;
+
+    @Schema(description = "ID da inspeção associada", example = "101")
     private Long inspecaoId;
 
     public FotoInspecaoResponseDTO() {

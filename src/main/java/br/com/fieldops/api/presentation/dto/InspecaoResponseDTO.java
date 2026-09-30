@@ -2,20 +2,40 @@ package br.com.fieldops.api.presentation.dto;
 
 import br.com.fieldops.api.domain.entity.Inspecao;
 import br.com.fieldops.api.domain.entity.StatusInspecao;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 
 public class InspecaoResponseDTO {
 
+    @Schema(description = "Identificador único da inspeção", example = "101")
     private Long id;
+
+    @Schema(description = "Descrição detalhada da atividade de inspeção", example = "Inspeção preventiva do compressor de ar")
     private String descricao;
+
+    @Schema(description = "Status atual da inspeção", example = "EM_ANDAMENTO")
     private StatusInspecao status;
+
+    @Schema(description = "Data e hora agendadas para realização", example = "2026-10-05T09:00:00")
     private LocalDateTime dataAgendada;
+
+    @Schema(description = "Data e hora em que a inspeção foi efetivamente realizada", example = "2026-10-05T09:45:00")
     private LocalDateTime dataRealizacao;
+
+    @Schema(description = "Observações e parecer do técnico", example = "Necessário substituir filtro de ar na próxima manutenção.")
     private String observacoes;
+
+    @Schema(description = "ID do equipamento inspecionado", example = "1")
     private Long equipamentoId;
+
+    @Schema(description = "Nome do equipamento inspecionado", example = "Compressor de Ar Parafuso 20HP")
     private String equipamentoNome;
+
+    @Schema(description = "ID do técnico responsável", example = "2")
     private Long usuarioId;
+
+    @Schema(description = "Nome do técnico responsável", example = "Carlos Eduardo")
     private String usuarioNome;
 
     public InspecaoResponseDTO() {
