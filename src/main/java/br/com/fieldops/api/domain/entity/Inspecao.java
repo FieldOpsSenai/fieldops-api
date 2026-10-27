@@ -31,7 +31,26 @@ public class Inspecao {
     @Column(name = "data_realizacao")
     private LocalDateTime dataRealizacao;
 
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
+
+    @Column(name = "precisao")
+    private Double precisao;
+
     private String observacoes;
+
+    // Novos campos de auditoria e revisão mapeados com a tabela do banco
+    @Column(name = "supervisor_id")
+    private Long supervisorId;
+
+    @Column(name = "data_revisao")
+    private LocalDateTime dataRevisao;
+
+    @Column(name = "motivo_reprovacao")
+    private String motivoReprovacao;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "equipamento_id", nullable = false)
