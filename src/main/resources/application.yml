@@ -6,27 +6,31 @@ spring:
     name: fieldops-api
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/fieldops_db
-    username: postgres
-    password: 200523
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/fieldops_db}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:200523}
     driver-class-name: org.postgresql.Driver
 
   jpa:
-    defer-datasource-initialization: true # ⭐ Libera a execução do import.sql após a criação/atualização das tabelas
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
 api:
   security:
     token:
       secret: ${JWT_SECRET:fieldops_secret_key_para_desenvolvimento_123456789}
 
-# ⭐ Configurações do Swagger/OpenAPI
+# Configurações do Swagger/OpenAPI
 springdoc:
   api-docs:
     path: /v3/api-docs

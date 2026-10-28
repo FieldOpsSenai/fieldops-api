@@ -8,8 +8,10 @@ import br.com.fieldops.api.domain.entity.Usuario;
 import br.com.fieldops.api.domain.repository.EquipamentoRepository;
 import br.com.fieldops.api.domain.repository.InspecaoRepository;
 import br.com.fieldops.api.domain.repository.UsuarioRepository;
+import br.com.fieldops.api.presentation.dto.InspecaoCancelamentoDTO;
 import br.com.fieldops.api.presentation.dto.InspecaoRequestDTO;
 import br.com.fieldops.api.presentation.dto.InspecaoResponseDTO;
+import br.com.fieldops.api.presentation.dto.InspecaoRevisaoDTO;
 import br.com.fieldops.api.presentation.dto.InspecaoStatusDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,7 +41,6 @@ public class InspecaoService {
         Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado com o ID: " + dto.getUsuarioId()));
 
-        // TRAVA DE SEGURANÇA: Garante que apenas usuários com perfil TECNICO recebam a inspeção
         if (!Perfil.TECNICO.equals(usuario.getPerfil())) {
             throw new IllegalArgumentException("A inspeção só pode ser atribuída a um usuário com perfil TÉCNICO.");
         }
@@ -83,5 +84,50 @@ public class InspecaoService {
         }
 
         return new InspecaoResponseDTO(inspecaoRepository.save(inspecao));
+    }
+
+    @Transactional
+    public InspecaoResponseDTO cancelarInspecao(Long id, InspecaoCancelamentoDTO dto) {
+        Inspecao inspecao = inspecaoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Inspeção não encontrada com o ID: " + id));
+
+        if (StatusInspecao.CONCLUIDA.equals(inspecao.getStatus())) {
+            throw new IllegalStateException("Não é possível cancelar uma inspeção que já foi concluída.");
+        }
+
+        inspecao.setStatus(StatusInspecao.CANCELADA);
+        inspecao.setObservacoes("CANCELADO: " + dto.getMotivo());
+
+        return new InspecaoResponseDTO(inspecaoRepository.save(inspecao));
+    }
+
+    @Transactional
+    public InspecaoResponseDTO revisarInspecao(Long id, InspecaoRevisaoDTO dto) {
+        Inspecao inspecao = inspecaoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Inspeção não encontrada com ID: " + id));
+
+        Usuario supervisor = usuarioRepository.findById(dto.getSupervisorId())
+                .orElseThrow(() -> new IllegalArgumentException("Supervisor não encontrado com ID: " + dto.getSupervisorId()));
+
+        if (!"SUPERVISOR".equals(supervisor.getPerfil())) {
+            throw new IllegalArgumentException("O usuário informado não possui perfil de Supervisor.");
+        }
+
+        inspecao.setSupervisorId(supervisor.getId());
+        inspecao.setDataRevisao(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
+
+        if (Boolean.TRUE.equals(dto.getAprovado())) {
+            inspecao.setStatus(StatusInspecao.CONCLUIDA);
+            inspecao.setMotivoReprovacao(null);
+        } else {
+            if (dto.getMotivoReprovacao() == null || dto.getMotivoReprovacao().isBlank()) {
+                throw new IllegalArgumentException("O motivo da reprovação é obrigatório quando a inspeção é rejeitada.");
+            }
+            inspecao.setStatus(StatusInspecao.EM_ANDAMENTO);
+            inspecao.setMotivoReprovacao(dto.getMotivoReprovacao());
+        }
+
+        Inspecao inspecaoSalva = inspecaoRepository.save(inspecao);
+        return new InspecaoResponseDTO(inspecaoSalva);
     }
 }

@@ -1,15 +1,17 @@
 package br.com.fieldops.api.presentation.controller;
 
 import br.com.fieldops.api.domain.service.InspecaoService;
+import br.com.fieldops.api.presentation.dto.InspecaoCancelamentoDTO;
 import br.com.fieldops.api.presentation.dto.InspecaoRequestDTO;
 import br.com.fieldops.api.presentation.dto.InspecaoResponseDTO;
+import br.com.fieldops.api.presentation.dto.InspecaoRevisaoDTO;
+import br.com.fieldops.api.presentation.dto.InspecaoStatusDTO;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import br.com.fieldops.api.presentation.dto.InspecaoStatusDTO;
 
 import java.util.List;
 
@@ -42,6 +44,25 @@ public class InspecaoController {
             @RequestBody @Valid InspecaoStatusDTO dto) {
         
         InspecaoResponseDTO response = inspecaoService.atualizarStatus(id, dto);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{id}/cancelar")
+    @Operation(summary = "Cancelar inspeção", description = "Cancela uma inspeção pendente ou agendada informando um motivo obrigatório")
+    public ResponseEntity<InspecaoResponseDTO> cancelarInspecao(
+            @PathVariable Long id,
+            @RequestBody @Valid InspecaoCancelamentoDTO dto) {
+        
+        InspecaoResponseDTO response = inspecaoService.cancelarInspecao(id, dto);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{id}/revisar")
+    @Operation(summary = "Revisar inspeção", description = "Permite ao supervisor aprovar ou reprovar uma inspeção realizada")
+    public ResponseEntity<InspecaoResponseDTO> revisarInspecao(
+            @PathVariable Long id,
+            @Valid @RequestBody InspecaoRevisaoDTO dto) {
+        InspecaoResponseDTO response = inspecaoService.revisarInspecao(id, dto);
         return ResponseEntity.ok(response);
     }
 }
