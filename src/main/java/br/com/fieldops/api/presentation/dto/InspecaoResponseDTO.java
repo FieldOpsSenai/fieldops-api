@@ -2,6 +2,7 @@ package br.com.fieldops.api.presentation.dto;
 
 import br.com.fieldops.api.domain.entity.Inspecao;
 import br.com.fieldops.api.domain.entity.StatusInspecao;
+import br.com.fieldops.api.domain.enums.PrioridadeInspecao;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,19 @@ public class InspecaoResponseDTO {
 
     @Schema(description = "Data e hora em que a inspeção foi efetivamente realizada", example = "2026-10-05T09:45:00")
     private LocalDateTime dataRealizacao;
+
+    private LocalDateTime dataLimite;
+
+    private PrioridadeInspecao prioridade;
+
+    private String instrucoes;
+
+    private Long modeloId;
+    private Integer modeloVersao;
+    private Long clienteId;
+    private String clienteNome;
+    private Long localId;
+    private String localNome;
 
     @Schema(description = "Observações e parecer do técnico", example = "Necessário substituir filtro de ar na próxima manutenção.")
     private String observacoes;
@@ -47,11 +61,26 @@ public class InspecaoResponseDTO {
         this.status = inspecao.getStatus();
         this.dataAgendada = inspecao.getDataAgendada();
         this.dataRealizacao = inspecao.getDataRealizacao();
+        this.dataLimite = inspecao.getDataLimite();
+        this.prioridade = inspecao.getPrioridade();
+        this.instrucoes = inspecao.getInstrucoes();
         this.observacoes = inspecao.getObservacoes();
         
         if (inspecao.getEquipamento() != null) {
             this.equipamentoId = inspecao.getEquipamento().getId();
             this.equipamentoNome = inspecao.getEquipamento().getNome();
+            if (inspecao.getEquipamento().getLocal() != null) {
+                this.localId = inspecao.getEquipamento().getLocal().getId();
+                this.localNome = inspecao.getEquipamento().getLocal().getNome();
+                if (inspecao.getEquipamento().getLocal().getCliente() != null) {
+                    this.clienteId = inspecao.getEquipamento().getLocal().getCliente().getId();
+                    this.clienteNome = inspecao.getEquipamento().getLocal().getCliente().getNome();
+                }
+            }
+        }
+        if (inspecao.getModeloInspecao() != null) {
+            this.modeloId = inspecao.getModeloInspecao().getId();
+            this.modeloVersao = inspecao.getModeloInspecao().getVersao();
         }
         
         if (inspecao.getUsuario() != null) {
@@ -99,6 +128,16 @@ public class InspecaoResponseDTO {
     public void setDataRealizacao(LocalDateTime dataRealizacao) {
         this.dataRealizacao = dataRealizacao;
     }
+
+    public LocalDateTime getDataLimite() { return dataLimite; }
+    public PrioridadeInspecao getPrioridade() { return prioridade; }
+    public String getInstrucoes() { return instrucoes; }
+    public Long getModeloId() { return modeloId; }
+    public Integer getModeloVersao() { return modeloVersao; }
+    public Long getClienteId() { return clienteId; }
+    public String getClienteNome() { return clienteNome; }
+    public Long getLocalId() { return localId; }
+    public String getLocalNome() { return localNome; }
 
     public String getObservacoes() {
         return observacoes;

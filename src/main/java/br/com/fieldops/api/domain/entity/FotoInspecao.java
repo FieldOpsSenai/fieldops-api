@@ -27,6 +27,10 @@ public class FotoInspecao {
     @JoinColumn(name = "inspecao_id", nullable = false)
     private Inspecao inspecao;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "snapshot_item_id")
+    private InspecaoSnapshotItem snapshotItem;
+
     public FotoInspecao() {
     }
 
@@ -85,4 +89,7 @@ public class FotoInspecao {
     public void setInspecao(Inspecao inspecao) {
         this.inspecao = inspecao;
     }
+
+    public InspecaoSnapshotItem getSnapshotItem() { return snapshotItem; }
+    public void setSnapshotItem(InspecaoSnapshotItem snapshotItem) { this.snapshotItem = snapshotItem; }
 }

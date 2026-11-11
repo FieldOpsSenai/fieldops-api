@@ -7,5 +7,6 @@ public record ItemInspecaoRequestDTO(
     String tipoResposta,
     Integer ordem,
     Boolean obrigatorio,
-    Boolean critico
+    Boolean critico,
+    Boolean evidenciaObrigatoria
 ) {}

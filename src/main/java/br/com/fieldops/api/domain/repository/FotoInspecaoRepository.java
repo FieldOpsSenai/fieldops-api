@@ -10,4 +10,6 @@ import java.util.List;
 public interface FotoInspecaoRepository extends JpaRepository<FotoInspecao, Long> {
 
     List<FotoInspecao> findByInspecaoId(Long inspecaoId);
+
+    List<FotoInspecao> findByInspecaoIdAndSnapshotItemId(Long inspecaoId, Long snapshotItemId);
 }

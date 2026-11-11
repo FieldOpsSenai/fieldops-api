@@ -32,6 +32,9 @@ public class ItemInspecao {
     @Column(nullable = false)
     private Boolean critico = false;
 
+    @Column(name = "evidencia_obrigatoria", nullable = false)
+    private Boolean evidenciaObrigatoria = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "secao_id", nullable = false)
     @JsonBackReference

@@ -19,6 +19,9 @@ public class EquipamentoRequestDTO {
     @Schema(description = "Categoria ou tipo do equipamento", example = "Pneumático")
     private String tipo;
 
+    @Schema(description = "Código QR único (opcional - se não informado será gerado automaticamente)", example = "EQP-CMP-001")
+    private String qrCode;
+
     @Schema(description = "ID do local/filial onde o equipamento está alocado", example = "10")
     @NotNull(message = "O ID do local é obrigatório")
     private Long localId;
