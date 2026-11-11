@@ -32,6 +32,9 @@ public class Equipamento {
     @Column(length = 100)
     private String tipo;
 
+    @Column(name = "qr_code", length = 100)
+    private String qrCode;
+
     @Column(nullable = false)
     private Boolean ativo = true;
 
