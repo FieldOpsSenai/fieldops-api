@@ -22,6 +22,8 @@ public class FotoInspecaoResponseDTO {
     @Schema(description = "ID da inspeção associada", example = "101")
     private Long inspecaoId;
 
+    private Long snapshotItemId;
+
     public FotoInspecaoResponseDTO() {
     }
 
@@ -32,6 +34,9 @@ public class FotoInspecaoResponseDTO {
         this.dataUpload = foto.getDataUpload();
         if (foto.getInspecao() != null) {
             this.inspecaoId = foto.getInspecao().getId();
+        }
+        if (foto.getSnapshotItem() != null) {
+            this.snapshotItemId = foto.getSnapshotItem().getId();
         }
     }
 
@@ -74,4 +79,7 @@ public class FotoInspecaoResponseDTO {
     public void setInspecaoId(Long inspecaoId) {
         this.inspecaoId = inspecaoId;
     }
+
+    public Long getSnapshotItemId() { return snapshotItemId; }
+    public void setSnapshotItemId(Long snapshotItemId) { this.snapshotItemId = snapshotItemId; }
 }

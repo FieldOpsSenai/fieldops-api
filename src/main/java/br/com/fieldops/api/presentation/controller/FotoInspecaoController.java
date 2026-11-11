@@ -21,14 +21,21 @@ public class FotoInspecaoController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<FotoInspecaoResponseDTO> uploadFoto(
             @PathVariable Long inspecaoId,
+            @RequestParam(required = false) Long snapshotItemId,
             @RequestParam("arquivo") MultipartFile arquivo) {
 
-        FotoInspecaoResponseDTO response = fotoInspecaoService.salvarFoto(inspecaoId, arquivo);
+        FotoInspecaoResponseDTO response = fotoInspecaoService.salvarFoto(inspecaoId, snapshotItemId, arquivo);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
     public ResponseEntity<List<FotoInspecaoResponseDTO>> listarFotos(@PathVariable Long inspecaoId) {
         return ResponseEntity.ok(fotoInspecaoService.listarPorInspecao(inspecaoId));
+    }
+
+    @GetMapping("/itens/{snapshotItemId}")
+    public ResponseEntity<List<FotoInspecaoResponseDTO>> listarFotosDoItem(
+            @PathVariable Long inspecaoId, @PathVariable Long snapshotItemId) {
+        return ResponseEntity.ok(fotoInspecaoService.listarPorItem(inspecaoId, snapshotItemId));
     }
 }
