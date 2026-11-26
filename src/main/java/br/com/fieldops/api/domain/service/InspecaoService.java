@@ -124,7 +124,7 @@ public class InspecaoService {
             throw new org.springframework.security.access.AccessDeniedException("Técnico inativo não pode consultar inspeções.");
         }
         return inspecaoRepository.findByUsuarioId(usuario.getId()).stream()
-                .map(InspecaoResponseDTO::new)
+                .map(this::toResponseDTO)
                 .toList();
     }
 
@@ -136,7 +136,19 @@ public class InspecaoService {
         if (!Boolean.TRUE.equals(usuario.getAtivo()) || !Perfil.TECNICO.equals(usuario.getPerfil()) || !usuario.getId().equals(inspecao.getUsuario().getId())) {
             throw new org.springframework.security.access.AccessDeniedException("A inspeção não está atribuída ao técnico autenticado.");
         }
-        return new InspecaoResponseDTO(inspecao);
+        return toResponseDTO(inspecao);
+    }
+
+    @Transactional(readOnly = true)
+    public InspecaoResponseDTO buscarPorId(Long id) {
+        Inspecao inspecao = inspecaoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Inspeção não encontrada com o ID: " + id));
+        Usuario usuario = usuarioAutenticado();
+        boolean gestor = usuario.getPerfil() == Perfil.SUPERVISOR || usuario.getPerfil() == Perfil.ADMINISTRADOR;
+        if (!Boolean.TRUE.equals(usuario.getAtivo()) || (!gestor && !usuario.getId().equals(inspecao.getUsuario().getId()))) {
+            throw new org.springframework.security.access.AccessDeniedException("Sem acesso à inspeção informada.");
+        }
+        return toResponseDTO(inspecao);
     }
 
     @Transactional(readOnly = true)
@@ -160,7 +172,7 @@ public class InspecaoService {
                                                 br.com.fieldops.api.domain.enums.PrioridadeInspecao prioridade, Pageable pageable) {
         exigirPlanejador();
         return inspecaoRepository.pesquisar(normalizarFiltro(termo), status, usuarioId, clienteId, prioridade, pageable)
-                .map(InspecaoResponseDTO::new);
+                .map(this::toResponseDTO);
     }
 
     @Transactional(readOnly = true)
@@ -227,7 +239,10 @@ public class InspecaoService {
         }
         inspecao.setStatus(StatusInspecao.CONCLUIDA);
         inspecao.setDataRealizacao(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
-        return new InspecaoResponseDTO(inspecaoRepository.save(inspecao));
+        inspecao.setRevisaoAprovada(null);
+        inspecao.setDataRevisao(null);
+        inspecao.setMotivoReprovacao(null);
+        return toResponseDTO(inspecaoRepository.save(inspecao));
     }
 
     @Transactional
@@ -271,15 +286,15 @@ public class InspecaoService {
         Inspecao inspecao = inspecaoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Inspeção não encontrada com ID: " + id));
 
-        Usuario supervisor = usuarioRepository.findById(dto.getSupervisorId())
-                .orElseThrow(() -> new IllegalArgumentException("Supervisor não encontrado com ID: " + dto.getSupervisorId()));
-
-        if (!"SUPERVISOR".equals(supervisor.getPerfil())) {
-            throw new IllegalArgumentException("O usuário informado não possui perfil de Supervisor.");
+        if (!StatusInspecao.CONCLUIDA.equals(inspecao.getStatus())) {
+            throw new IllegalStateException("Apenas inspeções concluídas podem ser revisadas.");
         }
 
-        inspecao.setSupervisorId(supervisor.getId());
+        Usuario revisor = usuarioAutenticado();
+
+        inspecao.setSupervisorId(revisor.getId());
         inspecao.setDataRevisao(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
+        inspecao.setRevisaoAprovada(Boolean.TRUE.equals(dto.getAprovado()));
 
         if (Boolean.TRUE.equals(dto.getAprovado())) {
             inspecao.setStatus(StatusInspecao.CONCLUIDA);
@@ -289,11 +304,20 @@ public class InspecaoService {
                 throw new IllegalArgumentException("O motivo da reprovação é obrigatório quando a inspeção é rejeitada.");
             }
             inspecao.setStatus(StatusInspecao.EM_ANDAMENTO);
-            inspecao.setMotivoReprovacao(dto.getMotivoReprovacao());
+            inspecao.setMotivoReprovacao(dto.getMotivoReprovacao().trim());
         }
 
         Inspecao inspecaoSalva = inspecaoRepository.save(inspecao);
-        return new InspecaoResponseDTO(inspecaoSalva);
+        return toResponseDTO(inspecaoSalva);
+    }
+
+    private InspecaoResponseDTO toResponseDTO(Inspecao inspecao) {
+        InspecaoResponseDTO dto = new InspecaoResponseDTO(inspecao);
+        if (inspecao.getSupervisorId() != null) {
+            usuarioRepository.findById(inspecao.getSupervisorId())
+                    .ifPresent(revisor -> dto.setSupervisorNome(revisor.getNome()));
+        }
+        return dto;
     }
 
     private void validarCadeiaCadastro(InspecaoRequestDTO dto, Equipamento equipamento) {

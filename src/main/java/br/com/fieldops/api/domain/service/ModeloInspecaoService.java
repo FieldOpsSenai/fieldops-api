@@ -28,8 +28,8 @@ public class ModeloInspecaoService {
     private final ItemInspecaoRepository itemInspecaoRepository;
 
     public ModeloInspecaoService(ModeloInspecaoRepository modeloInspecaoRepository,
-                                 SecaoInspecaoRepository secaoInspecaoRepository,
-                                 ItemInspecaoRepository itemInspecaoRepository) {
+            SecaoInspecaoRepository secaoInspecaoRepository,
+            ItemInspecaoRepository itemInspecaoRepository) {
         this.modeloInspecaoRepository = modeloInspecaoRepository;
         this.secaoInspecaoRepository = secaoInspecaoRepository;
         this.itemInspecaoRepository = itemInspecaoRepository;
@@ -77,7 +77,8 @@ public class ModeloInspecaoService {
                         item.setOrdem(itemDto.ordem() != null ? itemDto.ordem() : 1);
                         item.setObrigatorio(itemDto.obrigatorio() != null ? itemDto.obrigatorio() : true);
                         item.setCritico(itemDto.critico() != null ? itemDto.critico() : false);
-                        item.setEvidenciaObrigatoria(itemDto.evidenciaObrigatoria() != null ? itemDto.evidenciaObrigatoria() : false);
+                        item.setEvidenciaObrigatoria(
+                                itemDto.evidenciaObrigatoria() != null ? itemDto.evidenciaObrigatoria() : false);
                         item.setSecao(secao);
                         return item;
                     }).collect(Collectors.toList());
@@ -120,7 +121,8 @@ public class ModeloInspecaoService {
                         item.setOrdem(itemDto.ordem() != null ? itemDto.ordem() : 1);
                         item.setObrigatorio(itemDto.obrigatorio() != null ? itemDto.obrigatorio() : true);
                         item.setCritico(itemDto.critico() != null ? itemDto.critico() : false);
-                        item.setEvidenciaObrigatoria(itemDto.evidenciaObrigatoria() != null ? itemDto.evidenciaObrigatoria() : false);
+                        item.setEvidenciaObrigatoria(
+                                itemDto.evidenciaObrigatoria() != null ? itemDto.evidenciaObrigatoria() : false);
                         item.setSecao(secao);
                         secao.getItens().add(item);
                     }
@@ -270,7 +272,8 @@ public class ModeloInspecaoService {
                 .anyMatch(s -> s.getItens() != null && !s.getItens().isEmpty());
 
         if (!possuiItens) {
-            throw new IllegalArgumentException("O modelo deve possuir pelo menos um item de verificação para ser publicado.");
+            throw new IllegalArgumentException(
+                    "O modelo deve possuir pelo menos um item de verificação para ser publicado.");
         }
 
         modelo.setStatus("PUBLICADO");
@@ -306,6 +309,7 @@ public class ModeloInspecaoService {
                         novoItem.setOrdem(itemOrigem.getOrdem());
                         novoItem.setObrigatorio(itemOrigem.getObrigatorio());
                         novoItem.setCritico(itemOrigem.getCritico());
+                        novoItem.setEvidenciaObrigatoria(Boolean.TRUE.equals(itemOrigem.getEvidenciaObrigatoria()));
                         novoItem.setSecao(novaSecao);
                         novosItens.add(novoItem);
                     }

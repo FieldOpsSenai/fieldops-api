@@ -37,6 +37,10 @@ public class RespostaInspecaoService {
         Inspecao inspecao = inspecaoRepository.findById(inspecaoId)
                 .orElseThrow(() -> new IllegalArgumentException("Inspeção não encontrada com o ID: " + inspecaoId));
         exigirTecnicoAtribuido(inspecao);
+        if (inspecao.getStatus() == br.com.fieldops.api.domain.entity.StatusInspecao.CONCLUIDA
+                || inspecao.getStatus() == br.com.fieldops.api.domain.entity.StatusInspecao.CANCELADA) {
+            throw new IllegalStateException("Não é possível alterar respostas de uma inspeção concluída ou cancelada.");
+        }
         snapshotRepository.findByIdAndInspecaoId(dto.getSnapshotItemId(), inspecaoId)
                 .orElseThrow(() -> new IllegalArgumentException("O item informado não pertence à inspeção."));
         RespostaInspecao resposta = respostaRepository.findByInspecaoIdAndItemModeloId(inspecaoId, dto.getSnapshotItemId())
@@ -52,7 +56,7 @@ public class RespostaInspecaoService {
     public List<RespostaInspecaoResponseDTO> listar(Long inspecaoId) {
         Inspecao inspecao = inspecaoRepository.findById(inspecaoId)
                 .orElseThrow(() -> new IllegalArgumentException("Inspeção não encontrada com o ID: " + inspecaoId));
-        exigirTecnicoAtribuido(inspecao);
+        exigirAcessoLeitura(inspecao);
         return respostaRepository.findByInspecaoId(inspecaoId).stream().map(RespostaInspecaoResponseDTO::new).toList();
     }
 
@@ -63,6 +67,16 @@ public class RespostaInspecaoService {
         if (!Boolean.TRUE.equals(usuario.getAtivo()) || usuario.getPerfil() != Perfil.TECNICO ||
                 !usuario.getId().equals(inspecao.getUsuario().getId())) {
             throw new AccessDeniedException("Apenas o técnico ativo atribuído pode responder esta inspeção.");
+        }
+    }
+
+    private void exigirAcessoLeitura(Inspecao inspecao) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new AccessDeniedException("Usuário autenticado não encontrado."));
+        boolean gestor = usuario.getPerfil() == Perfil.SUPERVISOR || usuario.getPerfil() == Perfil.ADMINISTRADOR;
+        if (!Boolean.TRUE.equals(usuario.getAtivo()) || (!gestor && !usuario.getId().equals(inspecao.getUsuario().getId()))) {
+            throw new AccessDeniedException("Sem acesso às respostas da inspeção informada.");
         }
     }
 }

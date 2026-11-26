@@ -31,11 +31,27 @@ public class InspecaoResponseDTO {
     private String instrucoes;
 
     private Long modeloId;
+    private String modeloTitulo;
     private Integer modeloVersao;
     private Long clienteId;
     private String clienteNome;
     private Long localId;
     private String localNome;
+
+    @Schema(description = "ID do supervisor/administrador que revisou a inspeção", example = "1")
+    private Long supervisorId;
+
+    @Schema(description = "Nome do revisor responsável pela decisão", example = "Admin")
+    private String supervisorNome;
+
+    @Schema(description = "Data e hora da revisão", example = "2026-10-05T14:30:00")
+    private LocalDateTime dataRevisao;
+
+    @Schema(description = "Decisão da revisão: true = aprovada, false = reprovada, null = aguardando revisão", example = "true")
+    private Boolean revisaoAprovada;
+
+    @Schema(description = "Justificativa informada na reprovação da inspeção", example = "Faltou foto nítida do manômetro.")
+    private String motivoReprovacao;
 
     @Schema(description = "Observações e parecer do técnico", example = "Necessário substituir filtro de ar na próxima manutenção.")
     private String observacoes;
@@ -80,8 +96,13 @@ public class InspecaoResponseDTO {
         }
         if (inspecao.getModeloInspecao() != null) {
             this.modeloId = inspecao.getModeloInspecao().getId();
+            this.modeloTitulo = inspecao.getModeloInspecao().getTitulo();
             this.modeloVersao = inspecao.getModeloInspecao().getVersao();
         }
+        this.supervisorId = inspecao.getSupervisorId();
+        this.dataRevisao = inspecao.getDataRevisao();
+        this.revisaoAprovada = inspecao.getRevisaoAprovada();
+        this.motivoReprovacao = inspecao.getMotivoReprovacao();
         
         if (inspecao.getUsuario() != null) {
             this.usuarioId = inspecao.getUsuario().getId();
@@ -133,11 +154,22 @@ public class InspecaoResponseDTO {
     public PrioridadeInspecao getPrioridade() { return prioridade; }
     public String getInstrucoes() { return instrucoes; }
     public Long getModeloId() { return modeloId; }
+    public String getModeloTitulo() { return modeloTitulo; }
     public Integer getModeloVersao() { return modeloVersao; }
     public Long getClienteId() { return clienteId; }
     public String getClienteNome() { return clienteNome; }
     public Long getLocalId() { return localId; }
     public String getLocalNome() { return localNome; }
+    public Long getSupervisorId() { return supervisorId; }
+    public void setSupervisorId(Long supervisorId) { this.supervisorId = supervisorId; }
+    public String getSupervisorNome() { return supervisorNome; }
+    public void setSupervisorNome(String supervisorNome) { this.supervisorNome = supervisorNome; }
+    public LocalDateTime getDataRevisao() { return dataRevisao; }
+    public void setDataRevisao(LocalDateTime dataRevisao) { this.dataRevisao = dataRevisao; }
+    public Boolean getRevisaoAprovada() { return revisaoAprovada; }
+    public void setRevisaoAprovada(Boolean revisaoAprovada) { this.revisaoAprovada = revisaoAprovada; }
+    public String getMotivoReprovacao() { return motivoReprovacao; }
+    public void setMotivoReprovacao(String motivoReprovacao) { this.motivoReprovacao = motivoReprovacao; }
 
     public String getObservacoes() {
         return observacoes;

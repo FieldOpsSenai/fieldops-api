@@ -24,6 +24,9 @@ public class FotoInspecaoResponseDTO {
 
     private Long snapshotItemId;
 
+    @Schema(description = "URL relativa da API para visualização/download do arquivo da foto", example = "/api/v1/inspecoes/101/fotos/50/arquivo")
+    private String urlArquivo;
+
     public FotoInspecaoResponseDTO() {
     }
 
@@ -34,6 +37,9 @@ public class FotoInspecaoResponseDTO {
         this.dataUpload = foto.getDataUpload();
         if (foto.getInspecao() != null) {
             this.inspecaoId = foto.getInspecao().getId();
+            if (foto.getId() != null) {
+                this.urlArquivo = "/api/v1/inspecoes/" + this.inspecaoId + "/fotos/" + this.id + "/arquivo";
+            }
         }
         if (foto.getSnapshotItem() != null) {
             this.snapshotItemId = foto.getSnapshotItem().getId();
@@ -82,4 +88,7 @@ public class FotoInspecaoResponseDTO {
 
     public Long getSnapshotItemId() { return snapshotItemId; }
     public void setSnapshotItemId(Long snapshotItemId) { this.snapshotItemId = snapshotItemId; }
+
+    public String getUrlArquivo() { return urlArquivo; }
+    public void setUrlArquivo(String urlArquivo) { this.urlArquivo = urlArquivo; }
 }

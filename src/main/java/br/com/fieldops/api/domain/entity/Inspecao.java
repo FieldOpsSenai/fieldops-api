@@ -62,6 +62,9 @@ public class Inspecao {
     @Column(name = "data_revisao")
     private LocalDateTime dataRevisao;
 
+    @Column(name = "revisao_aprovada")
+    private Boolean revisaoAprovada;
+
     @Column(name = "motivo_reprovacao")
     private String motivoReprovacao;
 
