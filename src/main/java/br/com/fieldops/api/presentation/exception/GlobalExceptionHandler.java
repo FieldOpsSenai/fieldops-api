@@ -80,6 +80,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resposta);
     }
 
+    // Trata conflitos de estado de negócio (ex: modelo já publicado, inspeção não revisável) -> HTTP 409
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Map<String, Object>> tratarIllegalStateException(IllegalStateException ex) {
+        Map<String, Object> resposta = new HashMap<>();
+        resposta.put("timestamp", LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
+        resposta.put("status", HttpStatus.CONFLICT.value());
+        resposta.put("erro", "Conflito de Estado");
+        resposta.put("mensagem", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(resposta);
+    }
+
     // Trata erros de validação do Spring (@Valid / @NotNull / @NotBlank) -> HTTP 400
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> tratarErro400(MethodArgumentNotValidException ex) {

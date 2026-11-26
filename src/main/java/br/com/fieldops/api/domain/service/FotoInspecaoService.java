@@ -23,8 +23,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.net.MalformedURLException;
 
 @Service
 public class FotoInspecaoService {
@@ -108,6 +112,32 @@ public class FotoInspecaoService {
         return fotoInspecaoRepository.findByInspecaoIdAndSnapshotItemId(inspecaoId, snapshotItemId).stream()
                 .map(FotoInspecaoResponseDTO::new)
                 .toList();
+    }
+
+    public record FotoArquivoDTO(FotoInspecao foto, Resource resource) {}
+
+    @Transactional(readOnly = true)
+    public FotoArquivoDTO carregarArquivo(Long inspecaoId, Long fotoId) {
+        Inspecao inspecao = inspecaoRepository.findById(inspecaoId)
+                .orElseThrow(() -> new IllegalArgumentException("Inspeção não encontrada com o ID: " + inspecaoId));
+        exigirAcessoTecnico(inspecao);
+
+        FotoInspecao foto = fotoInspecaoRepository.findById(fotoId)
+                .orElseThrow(() -> new IllegalArgumentException("Foto não encontrada com o ID: " + fotoId));
+        if (!foto.getInspecao().getId().equals(inspecaoId)) {
+            throw new IllegalArgumentException("A foto informada não pertence à inspeção.");
+        }
+
+        try {
+            Path caminho = Paths.get(foto.getCaminhoArquivo()).normalize();
+            Resource resource = new UrlResource(caminho.toUri());
+            if (!resource.exists() || !resource.isReadable()) {
+                throw new jakarta.persistence.EntityNotFoundException("Arquivo de foto não encontrado no servidor.");
+            }
+            return new FotoArquivoDTO(foto, resource);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Erro ao carregar o arquivo de foto: " + e.getMessage(), e);
+        }
     }
 
     private void exigirAcessoTecnico(Inspecao inspecao) {

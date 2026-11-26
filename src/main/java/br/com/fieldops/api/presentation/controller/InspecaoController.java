@@ -72,6 +72,12 @@ public class InspecaoController {
         return ResponseEntity.ok(inspecaoService.buscarMinhaInspecao(id));
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Buscar detalhes de uma inspeção por ID", description = "Acessível por ADMINISTRADOR, SUPERVISOR ou pelo técnico atribuído")
+    public ResponseEntity<InspecaoResponseDTO> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(inspecaoService.buscarPorId(id));
+    }
+
     @PostMapping("/{id}/confirmar-equipamento")
     @Operation(summary = "Confirmar o equipamento da inspeção pela leitura do QR Code")
     public ResponseEntity<ConfirmacaoEquipamentoResponseDTO> confirmarEquipamento(
@@ -90,7 +96,7 @@ public class InspecaoController {
     public ResponseEntity<InspecaoResponseDTO> atualizarStatus(
             @PathVariable Long id,
             @RequestBody @Valid InspecaoStatusDTO dto) {
-        
+
         InspecaoResponseDTO response = inspecaoService.atualizarStatus(id, dto);
         return ResponseEntity.ok(response);
     }
@@ -106,7 +112,7 @@ public class InspecaoController {
     public ResponseEntity<InspecaoResponseDTO> cancelarInspecao(
             @PathVariable Long id,
             @RequestBody @Valid InspecaoCancelamentoDTO dto) {
-        
+
         InspecaoResponseDTO response = inspecaoService.cancelarInspecao(id, dto);
         return ResponseEntity.ok(response);
     }
@@ -120,7 +126,7 @@ public class InspecaoController {
     }
 
     @PatchMapping("/{id}/revisar")
-    @Operation(summary = "Revisar inspeção", description = "Permite ao supervisor aprovar ou reprovar uma inspeção realizada")
+    @Operation(summary = "Revisar inspeção", description = "Permite ao supervisor ou administrador aprovar ou reprovar uma inspeção concluída")
     public ResponseEntity<InspecaoResponseDTO> revisarInspecao(
             @PathVariable Long id,
             @Valid @RequestBody InspecaoRevisaoDTO dto) {

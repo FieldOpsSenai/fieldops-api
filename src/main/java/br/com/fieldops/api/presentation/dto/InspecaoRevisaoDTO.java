@@ -1,10 +1,11 @@
 package br.com.fieldops.api.presentation.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
 public class InspecaoRevisaoDTO {
 
-    @NotNull(message = "O ID do supervisor é obrigatório")
+    @Schema(description = "ID do revisor (opcional; quando omitido, utiliza o usuário autenticado da sessão)", example = "1")
     private Long supervisorId;
 
     @NotNull(message = "O status de aprovação é obrigatório")

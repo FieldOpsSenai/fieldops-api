@@ -3,6 +3,8 @@ package br.com.fieldops.api.presentation.controller;
 import br.com.fieldops.api.domain.service.FotoInspecaoService;
 import br.com.fieldops.api.presentation.dto.FotoInspecaoResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,5 +39,19 @@ public class FotoInspecaoController {
     public ResponseEntity<List<FotoInspecaoResponseDTO>> listarFotosDoItem(
             @PathVariable Long inspecaoId, @PathVariable Long snapshotItemId) {
         return ResponseEntity.ok(fotoInspecaoService.listarPorItem(inspecaoId, snapshotItemId));
+    }
+
+    @GetMapping("/{fotoId}/arquivo")
+    public ResponseEntity<Resource> visualizarFoto(
+            @PathVariable Long inspecaoId, @PathVariable Long fotoId) {
+        FotoInspecaoService.FotoArquivoDTO arquivo = fotoInspecaoService.carregarArquivo(inspecaoId, fotoId);
+        MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
+        if (arquivo.foto().getTipoConteudo() != null && !arquivo.foto().getTipoConteudo().isBlank()) {
+            mediaType = MediaType.parseMediaType(arquivo.foto().getTipoConteudo());
+        }
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + arquivo.foto().getNomeArquivo() + "\"")
+                .body(arquivo.resource());
     }
 }
